@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendrier Décembre</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f7f6f3;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .view-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .view-btn {
+            padding: 8px 20px;
+            border: 2px solid white;
+            background: transparent;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .view-btn.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .view-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .view-btn.active:hover {
+            background: white;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        /* Vue Mois */
+        .month-view {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+
+        .day-header {
+            text-align: center;
+            font-weight: 600;
+            padding: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .day-cell {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px;
+            min-height: 120px;
+            background: #fafafa;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .day-cell:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .day-number {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .day-cell.empty {
+            background: transparent;
+            border: none;
+            cursor: default;
+        }
+
+        .day-cell.empty:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .task-count {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin-top: 5px;
+        }
+
+        /* Vue Semaine */
+        .week-view {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+        }
+
+        .week-day {
+            flex: 1;
+            min-width: 200px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            background: #fafafa;
+        }
+
+        .week-day-header {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        /* Vue Jour */
+        .day-view {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .day-view-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .day-view-header h2 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .day-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .day-selector button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .day-selector button:hover {
+            background: #f5f5f5;
+        }
+
+        /* Tâches */
+        .tasks-container {
+            margin-top: 15px;
+        }
+
+        .task-item {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .task-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .task-text {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .task-text.completed {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .task-priority {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .priority-high {
+            background: #fee;
+            color: #c33;
+        }
+
+        .priority-medium {
+            background: #fef3cd;
+            color: #856404;
+        }
+
+        .priority-low {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .task-repeat {
+            font-size: 11px;
+            color: #667eea;
+            background: #e8eaf6;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+
+        .task-delete {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .task-delete:hover {
+            background: #cc0000;
+        }
+
+        /* Formulaire d'ajout */
+        .add-task-form {
+            background: #f9f9f9;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .add-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            width: 100%;
+        }
+
+        .add-btn:hover {
+            background: #5568d3;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .repeat-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📅 Décembre 2024</h1>
+            <div class="view-controls">
+                <button class="view-btn active" onclick="changeView('month')">Mois</button>
+                <button class="view-btn" onclick="changeView('week')">Semaine</button>
+                <button class="view-btn" onclick="changeView('day')">Jour</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Vue Mois -->
+            <div id="monthView" class="month-view">
+                <div class="day-header">Dim</div>
+                <div class="day-header">Lun</div>
+                <div class="day-header">Mar</div>
+                <div class="day-header">Mer</div>
+                <div class="day-header">Jeu</div>
+                <div class="day-header">Ven</div>
+                <div class="day-header">Sam</div>
+            </div>
+
+            <!-- Vue Semaine -->
+            <div id="weekView" class="week-view hidden"></div>
+
+            <!-- Vue Jour -->
+            <div id="dayView" class="day-view hidden">
+                <div class="day-view-header">
+                    <h2 id="dayViewTitle">1 Décembre 2024</h2>
+                    <div class="day-selector">
+                        <button onclick="changeDay(-1)">◀ Précédent</button>
+                        <button onclick="changeDay(1)">Suivant ▶</button>
+                    </div>
+                </div>
+
+                <div class="add-task-form">
+                    <div class="form-group">
+                        <label>Nouvelle tâche</label>
+                        <input type="text" id="taskInput" placeholder="Entrez une tâche...">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Priorité</label>
+                            <select id="prioritySelect">
+                                <option value="low">Basse</option>
+                                <option value="medium">Moyenne</option>
+                                <option value="high">Haute</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Répétition</label>
+                            <select id="repeatSelect" onchange="updateRepeatInfo()">
+                                <option value="none">Aucune</option>
+                                <option value="daily">Quotidienne</option>
+                                <option value="weekly">Hebdomadaire</option>
+                                <option value="weekdays">Jours ouvrables (Lun-Ven)</option>
+                                <option value="weekends">Week-ends</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="repeatInfo" class="repeat-info"></div>
+                    
+                    <button class="add-btn" onclick="addTask()">Ajouter la tâche</button>
+                </div>
+
+                <div id="dayTasks" class="tasks-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentView = 'month';
+        let currentDay = 1;
+        let currentWeek = 0;
+        let tasks = {};
+
+        const daysInDecember = 31;
+        const firstDayOfWeek = 0; // Dimanche = 0, Lundi = 1, etc.
+
+        function initCalendar() {
+            renderMonthView();
+            updateRepeatInfo();
+        }
+
+        function renderMonthView() {
+            const monthView = document.getElementById('monthView');
+            
+            const headers = monthView.querySelectorAll('.day-header');
+            monthView.innerHTML = '';
+            headers.forEach(h => monthView.appendChild(h));
+
+            for (let i = 0; i < firstDayOfWeek; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'day-cell empty';
+                monthView.appendChild(emptyCell);
+            }
+
+            for (let day = 1; day <= daysInDecember; day++) {
+                const dayCell = document.createElement('div');
+                dayCell.className = 'day-cell';
+                dayCell.onclick = () => {
+                    currentDay = day;
+                    changeView('day');
+                };
+
+                const dayNumber = document.createElement('div');
+                dayNumber.className = 'day-number';
+                dayNumber.textContent = day;
+                dayCell.appendChild(dayNumber);
+
+                const taskCount = tasks[day] ? tasks[day].length : 0;
+                if (taskCount > 0) {
+                    const badge = document.createElement('div');
+                    badge.className = 'task-count';
+                    badge.textContent = `${taskCount} tâche${taskCount > 1 ? 's' : ''}`;
+                    dayCell.appendChild(badge);
+                }
+
+                monthView.appendChild(dayCell);
+            }
+        }
+
+        function renderWeekView() {
+            const weekView = document.getElementById('weekView');
+            weekView.innerHTML = '';
+
+            const startDay = currentWeek * 7 + 1;
+            const endDay = Math.min(startDay + 6, daysInDecember);
+
+            for (let day = startDay; day <= endDay; day++) {
+                const weekDay = document.createElement('div');
+                weekDay.className = 'week-day';
+
+                const header = document.createElement('div');
+                header.className = 'week-day-header';
+                header.textContent = `${day} Décembre`;
+                weekDay.appendChild(header);
+
+                const tasksContainer = document.createElement('div');
+                tasksContainer.className = 'tasks-container';
+                
+                if (tasks[day]) {
+                    tasks[day].forEach((task, index) => {
+                        const taskEl = createTaskElement(task, day, index);
+                        tasksContainer.appendChild(taskEl);
+                    });
+                }
+
+                weekDay.appendChild(tasksContainer);
+                weekView.appendChild(weekDay);
+            }
+        }
+
+        function renderDayView() {
+            const dayViewTitle = document.getElementById('dayViewTitle');
+            const dayNames = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+            const dayOfWeek = (firstDayOfWeek + currentDay - 1) % 7;
+            dayViewTitle.textContent = `${dayNames[dayOfWeek]} ${currentDay} Décembre 2024`;
+
+            const dayTasks = document.getElementById('dayTasks');
+            dayTasks.innerHTML = '';
+
+            if (tasks[currentDay]) {
+                tasks[currentDay].forEach((task, index) => {
+                    const taskEl = createTaskElement(task, currentDay, index);
+                    dayTasks.appendChild(taskEl);
+                });
+            }
+
+            if (!tasks[currentDay] || tasks[currentDay].length === 0) {
+                dayTasks.innerHTML = '<p style="text-align:center;color:#999;padding:30px;">Aucune tâche pour ce jour</p>';
+            }
+        }
+
+        function createTaskElement(task, day, index) {
+            const taskItem = document.createElement('div');
+            taskItem.className = 'task-item';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'task-checkbox';
+            checkbox.checked = task.completed;
+            checkbox.onchange = () => toggleTask(day, index);
+
+            const taskText = document.createElement('div');
+            taskText.className = 'task-text' + (task.completed ? ' completed' : '');
+            taskText.textContent = task.text;
+
+            const priority = document.createElement('span');
+            priority.className = `task-priority priority-${task.priority}`;
+            priority.textContent = task.priority === 'high' ? 'Haute' : 
+                                   task.priority === 'medium' ? 'Moyenne' : 'Basse';
+
+            taskItem.appendChild(checkbox);
+            taskItem.appendChild(taskText);
+            taskItem.appendChild(priority);
+
+            if (task.repeat && task.repeat !== 'none') {
+                const repeatBadge = document.createElement('span');
+                repeatBadge.className = 'task-repeat';
+                const repeatLabels = {
+                    'daily': '🔄 Quotidien',
+                    'weekly': '🔄 Hebdo',
+                    'weekdays': '🔄 Lun-Ven',
+                    'weekends': '🔄 Week-end'
+                };
+                repeatBadge.textContent = repeatLabels[task.repeat];
+                taskItem.appendChild(repeatBadge);
+            }
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'task-delete';
+            deleteBtn.textContent = '✕';
+            deleteBtn.onclick = () => deleteTask(day, index, task.repeat);
+
+            taskItem.appendChild(deleteBtn);
+
+            return taskItem;
+        }
+
+        function updateRepeatInfo() {
+            const repeat = document.getElementById('repeatSelect').value;
+            const info = document.getElementById('repeatInfo');
+            
+            const messages = {
+                'none': '',
+                'daily': `Cette tâche sera ajoutée sur tous les jours du ${currentDay} au 31 décembre`,
+                'weekly': `Cette tâche sera ajoutée chaque ${getDayName(currentDay)} du mois`,
+                'weekdays': 'Cette tâche sera ajoutée sur tous les jours ouvrables (Lun-Ven)',
+                'weekends': 'Cette tâche sera ajoutée sur tous les week-ends (Sam-Dim)'
+            };
+            
+            info.textContent = messages[repeat];
+        }
+
+        function getDayName(day) {
+            const dayNames = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+            const dayOfWeek = (firstDayOfWeek + day - 1) % 7;
+            return dayNames[dayOfWeek];
+        }
+
+        function getDaysToRepeat(startDay, repeatType) {
+            const days = [];
+            
+            if (repeatType === 'none') {
+                days.push(startDay);
+            } else if (repeatType === 'daily') {
+                for (let day = startDay; day <= daysInDecember; day++) {
+                    days.push(day);
+                }
+            } else if (repeatType === 'weekly') {
+                const startDayOfWeek = (firstDayOfWeek + startDay - 1) % 7;
+                for (let day = startDay; day <= daysInDecember; day++) {
+                    const dayOfWeek = (firstDayOfWeek + day - 1) % 7;
+                    if (dayOfWeek === startDayOfWeek) {
+                        days.push(day);
+                    }
+                }
+            } else if (repeatType === 'weekdays') {
+                for (let day = 1; day <= daysInDecember; day++) {
+                    const dayOfWeek = (firstDayOfWeek + day - 1) % 7;
+                    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+                        days.push(day);
+                    }
+                }
+            } else if (repeatType === 'weekends') {
+                for (let day = 1; day <= daysInDecember; day++) {
+                    const dayOfWeek = (firstDayOfWeek + day - 1) % 7;
+                    if (dayOfWeek === 0 || dayOfWeek === 6) {
+                        days.push(day);
+                    }
+                }
+            }
+            
+            return days;
+        }
+
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            const priority = document.getElementById('prioritySelect').value;
+            const repeat = document.getElementById('repeatSelect').value;
+            const text = input.value.trim();
+
+            if (!text) return;
+
+            const daysToAdd = getDaysToRepeat(currentDay, repeat);
+
+            daysToAdd.forEach(day => {
+                if (!tasks[day]) {
+                    tasks[day] = [];
+                }
+                tasks[day].push({
+                    text: text,
+                    priority: priority,
+                    repeat: repeat,
+                    completed: false
+                });
+            });
+
+            input.value = '';
+            document.getElementById('repeatSelect').value = 'none';
+            updateRepeatInfo();
+            renderCurrentView();
+        }
+
+        function toggleTask(day, index) {
+            tasks[day][index].completed = !tasks[day][index].completed;
+            renderCurrentView();
+        }
+
+        function deleteTask(day, index, repeat) {
+            if (repeat && repeat !== 'none') {
+                const confirmMsg = 'Cette tâche est répétée. Voulez-vous la supprimer sur tous les jours ?';
+                if (confirm(confirmMsg)) {
+                    const taskText = tasks[day][index].text;
+                    for (let d = 1; d <= daysInDecember; d++) {
+                        if (tasks[d]) {
+                            tasks[d] = tasks[d].filter(t => t.text !== taskText || t.repeat !== repeat);
+                            if (tasks[d].length === 0) delete tasks[d];
+                        }
+                    }
+                } else {
+                    tasks[day].splice(index, 1);
+                    if (tasks[day].length === 0) delete tasks[day];
+                }
+            } else {
+                tasks[day].splice(index, 1);
+                if (tasks[day].length === 0) delete tasks[day];
+            }
+            renderCurrentView();
+        }
+
+        function changeView(view) {
+            currentView = view;
+
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.getElementById('monthView').classList.add('hidden');
+            document.getElementById('weekView').classList.add('hidden');
+            document.getElementById('dayView').classList.add('hidden');
+
+            if (view === 'month') {
+                document.getElementById('monthView').classList.remove('hidden');
+                renderMonthView();
+            } else if (view === 'week') {
+                document.getElementById('weekView').classList.remove('hidden');
+                renderWeekView();
+            } else {
+                document.getElementById('dayView').classList.remove('hidden');
+                renderDayView();
+            }
+        }
+
+        function changeDay(delta) {
+            currentDay += delta;
+            if (currentDay < 1) currentDay = 1;
+            if (currentDay > daysInDecember) currentDay = daysInDecember;
+            renderDayView();
+            updateRepeatInfo();
+        }
+
+        function renderCurrentView() {
+            if (currentView === 'month') {
+                renderMonthView();
+            } else if (currentView === 'week') {
+                renderWeekView();
+            } else {
+                renderDayView();
+            }
+        }
+
+        document.getElementById('taskInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+
+        initCalendar();
+    </script>
+</body>
+</html>
